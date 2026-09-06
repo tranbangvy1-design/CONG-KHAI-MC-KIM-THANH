@@ -20,9 +20,10 @@ jobs:
       YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
 
       # chọn thumb tiêu đề bắt đầu
-      SEQ_BASE_RUN: "3"
+      SEQ_BASE_RUN: "4"
       TITLE_START: "1"
       THUMB_START: "180"
+      HOST_START: "180"
 
       # công tắc chọn poll hoặc cloudflare
       IMG_PROVIDER: cloudflare
