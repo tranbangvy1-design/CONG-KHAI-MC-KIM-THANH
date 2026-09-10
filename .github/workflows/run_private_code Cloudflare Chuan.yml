@@ -25,7 +25,7 @@ jobs:
 
       # chọn thumb tiêu đề bắt đầu
       SEQ_BASE_RUN: "13"
-      TITLE_START: "13"
+      TITLE_START: "10"
       HOST_START: "181"
 
       # công tắc chọn poll hoặc cloudflare
