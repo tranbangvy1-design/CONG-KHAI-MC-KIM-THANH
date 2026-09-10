@@ -206,8 +206,8 @@ jobs:
           set -e
           python -u scripts/generate_thumbnails.py
 
-      # Commit & PUSH CSV về repo PRIVATE qua PAT
-      - name: Commit & push state CSVs back to PRIVATE (PAT)
+      # Commit & PUSH CSV và chỉ số host về repo PRIVATE qua PAT
+      - name: Commit & push state CSVs and host index back to PRIVATE (PAT)
         if: ${{ steps.auth.outputs.mode == 'pat' }}
         working-directory: private-src
         env:
@@ -226,7 +226,8 @@ jobs:
             [ -f "$f" ] && FILES="$FILES $f"
             [ -n "$DIR_FOUND" ] && [ -f "$DIR_FOUND/$f" ] && FILES="$FILES $DIR_FOUND/$f"
           done
-          [ -z "$FILES" ] && { echo "[INFO] Không có CSV để commit."; exit 0; }
+          HOST_STATE="${DIR_FOUND#private-src/}/.state/host_index.txt"
+          [ -z "$FILES" ] && [ ! -f "$HOST_STATE" ] && { echo "[INFO] Không có CSV hoặc chỉ số host để commit."; exit 0; }
 
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -235,9 +236,14 @@ jobs:
           CURBR=$(git rev-parse --abbrev-ref HEAD || true)
           [ "$CURBR" = "HEAD" ] && git checkout -b ci-state-update
 
-          git add -- $FILES
+          if [ -n "$FILES" ]; then
+            git add -- $FILES
+          fi
+          if [ -f "$HOST_STATE" ]; then
+            git add -f -- "$HOST_STATE"
+          fi
           git diff --cached --quiet && { echo "[INFO] Không có thay đổi."; exit 0; }
-          git commit -m "ci(state): update promptdalay.csv, links_done.csv, tieudedalay.csv"
+          git commit -m "ci(state): update CSVs and host_index.txt"
 
           # Giảm lỗi non-fast-forward khi có job khác vừa push
           git pull --rebase origin "${PRIVATE_REF}" || true
@@ -255,8 +261,8 @@ jobs:
           echo "::error::Push thất bại sau 5 lần retry."
           exit 1
 
-      # Commit & PUSH CSV về repo PRIVATE qua SSH
-      - name: Commit & push state CSVs back to PRIVATE (SSH)
+      # Commit & PUSH CSV và chỉ số host về repo PRIVATE qua SSH
+      - name: Commit & push state CSVs and host index back to PRIVATE (SSH)
         if: ${{ steps.auth.outputs.mode == 'ssh' }}
         working-directory: private-src
         env:
@@ -280,7 +286,8 @@ jobs:
             [ -f "$f" ] && FILES="$FILES $f"
             [ -n "$DIR_FOUND" ] && [ -f "$DIR_FOUND/$f" ] && FILES="$FILES $DIR_FOUND/$f"
           done
-          [ -z "$FILES" ] && { echo "[INFO] Không có CSV để commit."; exit 0; }
+          HOST_STATE="${DIR_FOUND#private-src/}/.state/host_index.txt"
+          [ -z "$FILES" ] && [ ! -f "$HOST_STATE" ] && { echo "[INFO] Không có CSV hoặc chỉ số host để commit."; exit 0; }
 
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -289,9 +296,14 @@ jobs:
           CURBR=$(git rev-parse --abbrev-ref HEAD || true)
           [ "$CURBR" = "HEAD" ] && git checkout -b ci-state-update
 
-          git add -- $FILES
+          if [ -n "$FILES" ]; then
+            git add -- $FILES
+          fi
+          if [ -f "$HOST_STATE" ]; then
+            git add -f -- "$HOST_STATE"
+          fi
           git diff --cached --quiet && { echo "[INFO] Không có thay đổi."; exit 0; }
-          git commit -m "ci(state): update promptdalay.csv, links_done.csv, tieudedalay.csv"
+          git commit -m "ci(state): update CSVs and host_index.txt"
 
           # Giảm lỗi non-fast-forward khi có job khác vừa push
           git pull --rebase origin "${PRIVATE_REF}" || true
