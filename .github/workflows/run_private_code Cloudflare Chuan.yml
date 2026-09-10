@@ -27,7 +27,7 @@ jobs:
       SEQ_BASE_RUN: "4"
       TITLE_START: "1"
       THUMB_START: "180"
-      HOST_START: "180"
+      HOST_START: "181"
 
       # công tắc chọn poll hoặc cloudflare
       IMG_PROVIDER: cloudflare
